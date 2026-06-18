@@ -1,0 +1,380 @@
+/* ─── Keyframes ─── */
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUpModal {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes checkPop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes setCompleteFlash {
+  0% {
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+    transform: scale(1.01);
+  }
+  100% {
+    background: transparent;
+    transform: scale(1);
+  }
+}
+
+@keyframes progressShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.92); }
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.08); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes celebrateGlow {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent); }
+  70% { box-shadow: 0 0 0 12px transparent; }
+  100% { box-shadow: none; }
+}
+
+@keyframes staggerIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loadingPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes navIconPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.25); }
+  100% { transform: scale(1.1); }
+}
+
+/* ─── Page & layout ─── */
+
+.page-enter {
+  animation: fadeSlideUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.app-loading p {
+  animation: loadingPulse 1.4s ease-in-out infinite;
+}
+
+/* ─── Modals ─── */
+
+.modal-overlay {
+  animation: fadeIn 0.25s ease both;
+}
+
+.modal-content {
+  animation: slideUpModal 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.modal-overlay--video .video-modal {
+  animation: fadeSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (min-width: 769px) {
+  .modal-content {
+    animation: fadeSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+/* ─── Bottom nav micro-interaction ─── */
+
+.bottom-nav-item {
+  transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bottom-nav-item:active {
+  transform: scale(0.92);
+}
+
+.bottom-nav-icon-wrap {
+  transition:
+    background 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.25s ease,
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bottom-nav-item.active .bottom-nav-icon-wrap {
+  animation: navIconPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ─── Pills & tabs ─── */
+
+.phase-pill,
+.tab,
+.week-pill,
+.phase-btn,
+.nav-item {
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.2s ease;
+}
+
+.phase-pill:active,
+.tab:active,
+.week-pill:active {
+  transform: scale(0.94);
+}
+
+.tab.active,
+.week-pill.active,
+.phase-pill.active {
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.tab-check,
+.pill-check {
+  display: inline-block;
+  animation: checkPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ─── Cards ─── */
+
+.exercise-card,
+.warmup-card,
+.library-card,
+.stat-card,
+.phase-progress-row {
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
+}
+
+.exercise-card.exercise-done {
+  animation: celebrateGlow 0.6s ease both;
+}
+
+.exercise-done-badge {
+  animation: checkPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.session-complete-badge {
+  animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ─── Set rows ─── */
+
+.set-row {
+  transition: opacity 0.25s ease, background 0.25s ease;
+  border-radius: 8px;
+}
+
+.set-row.completed {
+  animation: setCompleteFlash 0.5s ease both;
+}
+
+.set-row input[type='text'] {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.set-row input[type='text']:focus {
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.set-row input[type='checkbox'] {
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.set-row input[type='checkbox']:checked {
+  animation: checkPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ─── Progress bars ─── */
+
+.session-progress-fill,
+.progress-bar-fill,
+.muscle-freq-bar {
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.progress-ring-label {
+  animation: scaleIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+.session-progress-bar.complete {
+  animation: celebrateGlow 0.8s ease both;
+}
+
+/* ─── Buttons ─── */
+
+.complete-workout-btn,
+.video-btn,
+.form-row button,
+.grid-cell {
+  transition:
+    transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.15s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.complete-workout-btn:active,
+.video-btn:active,
+.form-row button:active {
+  transform: scale(0.96);
+}
+
+.complete-workout-btn:not(.done):hover,
+.video-btn:hover {
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.grid-cell.complete {
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.grid-cell:active {
+  transform: scale(0.92);
+}
+
+.muscle-map-btn {
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.muscle-map-btn:active {
+  transform: scale(0.95);
+}
+
+.icon-btn {
+  transition: color 0.15s ease, transform 0.15s ease, background 0.15s ease;
+  border-radius: 8px;
+}
+
+.icon-btn:active {
+  transform: scale(0.9);
+  background: var(--bg);
+}
+
+/* ─── Staggered lists ─── */
+
+.exercise-list .exercise-card {
+  animation: staggerIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.exercise-list .exercise-card:nth-child(1) { animation-delay: 0.03s; }
+.exercise-list .exercise-card:nth-child(2) { animation-delay: 0.06s; }
+.exercise-list .exercise-card:nth-child(3) { animation-delay: 0.09s; }
+.exercise-list .exercise-card:nth-child(4) { animation-delay: 0.12s; }
+.exercise-list .exercise-card:nth-child(5) { animation-delay: 0.15s; }
+.exercise-list .exercise-card:nth-child(6) { animation-delay: 0.18s; }
+.exercise-list .exercise-card:nth-child(n+7) { animation-delay: 0.21s; }
+
+.stat-grid .stat-card {
+  animation: staggerIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.stat-grid .stat-card:nth-child(1) { animation-delay: 0.05s; }
+.stat-grid .stat-card:nth-child(2) { animation-delay: 0.1s; }
+.stat-grid .stat-card:nth-child(3) { animation-delay: 0.15s; }
+.stat-grid .stat-card:nth-child(4) { animation-delay: 0.2s; }
+.stat-grid .stat-card:nth-child(5) { animation-delay: 0.25s; }
+.stat-grid .stat-card:nth-child(6) { animation-delay: 0.3s; }
+
+.warmup-grid .warmup-card,
+.library-grid .library-card {
+  animation: staggerIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.warmup-grid .warmup-card:nth-child(odd),
+.library-grid .library-card:nth-child(odd) {
+  animation-delay: 0.04s;
+}
+
+.warmup-grid .warmup-card:nth-child(even),
+.library-grid .library-card:nth-child(even) {
+  animation-delay: 0.08s;
+}
+
+.recent-list li {
+  animation: staggerIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.recent-list li:nth-child(1) { animation-delay: 0.04s; }
+.recent-list li:nth-child(2) { animation-delay: 0.08s; }
+.recent-list li:nth-child(3) { animation-delay: 0.12s; }
+.recent-list li:nth-child(4) { animation-delay: 0.16s; }
+
+.body-region.active {
+  transition: fill 0.4s ease, opacity 0.4s ease;
+}
+
+.muscle-legend li {
+  animation: fadeSlideUp 0.3s ease both;
+}
+
+.muscle-legend li:nth-child(1) { animation-delay: 0.05s; }
+.muscle-legend li:nth-child(2) { animation-delay: 0.1s; }
+.muscle-legend li:nth-child(3) { animation-delay: 0.15s; }
+.muscle-legend li:nth-child(4) { animation-delay: 0.2s; }
+
+/* ─── Reduced motion ─── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,14 @@
+node_modules
+dist
+data
+.git
+.gitignore
+*.db
+*.log
+.DS_Store
+.env
+.env.*
+README.md
+DEPLOY.md
+scripts/share.sh
+agent-transcripts

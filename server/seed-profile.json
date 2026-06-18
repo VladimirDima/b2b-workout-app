@@ -1,0 +1,169 @@
+{
+  "deviceId": "62ded9ca-3c68-424f-85fe-1467a93523e2",
+  "logs": {
+    "phase-0::day-3::w2::Goblet Squat": {
+      "sets": [
+        {
+          "weight": "8",
+          "reps": "10",
+          "completed": true
+        },
+        {
+          "weight": "8",
+          "reps": "10",
+          "completed": true
+        },
+        {
+          "weight": "8",
+          "reps": "10",
+          "completed": true
+        }
+      ]
+    },
+    "phase-0::day-3::w2::Underhand Lat Pulldowns": {
+      "sets": [
+        {
+          "weight": "32",
+          "reps": "12",
+          "completed": true
+        },
+        {
+          "weight": "32",
+          "reps": "12",
+          "completed": true
+        },
+        {
+          "weight": "32",
+          "reps": "12",
+          "completed": true
+        }
+      ]
+    },
+    "phase-0::day-3::w2::Dumbbell Step-Up": {
+      "sets": [
+        {
+          "weight": "4",
+          "reps": "10",
+          "completed": true
+        },
+        {
+          "weight": "4",
+          "reps": "10",
+          "completed": true
+        }
+      ]
+    },
+    "phase-0::day-3::w2::Dumbbell Farmer Carry": {
+      "sets": [
+        {
+          "weight": "18",
+          "reps": "40",
+          "completed": true
+        },
+        {
+          "weight": "18",
+          "reps": "40",
+          "completed": true
+        },
+        {
+          "weight": "14",
+          "reps": "10",
+          "completed": true
+        }
+      ]
+    },
+    "phase-0::day-3::w2::TYIs on Incline Bench": {
+      "sets": [
+        {
+          "weight": "2",
+          "reps": "6",
+          "completed": true
+        },
+        {
+          "weight": "2",
+          "reps": "6",
+          "completed": true
+        }
+      ]
+    },
+    "phase-0::day-3::w2::Front Plank": {
+      "sets": [
+        {
+          "weight": "0",
+          "reps": "6",
+          "completed": true
+        },
+        {
+          "weight": "0",
+          "reps": "6",
+          "completed": true
+        }
+      ]
+    },
+    "phase-0::day-3::w2::Dumbbell Biceps Curls": {
+      "sets": [
+        {
+          "weight": "7",
+          "reps": "15",
+          "completed": true
+        },
+        {
+          "weight": "7",
+          "reps": "15",
+          "completed": true
+        },
+        {
+          "weight": "7",
+          "reps": "8",
+          "completed": true
+        }
+      ]
+    },
+    "phase-0::day-3::w2::Seated Cable Row": {
+      "sets": [
+        {
+          "weight": "27",
+          "reps": "12",
+          "completed": true
+        },
+        {
+          "weight": "27",
+          "reps": "12",
+          "completed": true
+        },
+        {
+          "weight": "27",
+          "reps": "12",
+          "completed": true
+        }
+      ]
+    }
+  },
+  "settings": {
+    "currentPhaseId": "phase-0",
+    "currentDayId": "day-1",
+    "currentWeek": 2,
+    "startDate": "2026-06-04",
+    "bodyWeight": "66,3"
+  },
+  "weightLog": [
+    {
+      "date": "2026-06-17",
+      "weight": "66,3"
+    }
+  ],
+  "completions": {
+    "phase-0::day-1::w1": {
+      "completedAt": "2026-06-17T13:18:20.663Z"
+    },
+    "phase-0::day-2::w1": {
+      "completedAt": "2026-06-17T13:18:22.079Z"
+    },
+    "phase-0::day-3::w1": {
+      "completedAt": "2026-06-17T13:18:23.130Z"
+    },
+    "phase-0::day-3::w2": {
+      "completedAt": "2026-06-17T13:26:42.419Z"
+    }
+  }
+}

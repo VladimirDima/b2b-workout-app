@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { AppSettings, CompletionRecord, CompletionState, SetLog, WeightEntry, WorkoutLogs } from '../types';
 import { fetchRemoteState, saveRemoteState, type SyncStatus } from '../api/storageApi';
-import { getDeviceId, setDeviceId, isValidDeviceId } from '../utils/deviceId';
+import { setDeviceId, isValidDeviceId, clearWorkoutLocalState, resolveDeviceId } from '../utils/deviceId';
 
 const LOGS_KEY = 'b2b-workout-logs';
 const SETTINGS_KEY = 'b2b-workout-settings';
@@ -53,11 +53,7 @@ function saveLocalState(state: {
 }
 
 function clearLocalState() {
-  localStorage.removeItem(LOGS_KEY);
-  localStorage.removeItem(SETTINGS_KEY);
-  localStorage.removeItem(WEIGHT_KEY);
-  localStorage.removeItem(COMPLETIONS_KEY);
-  localStorage.removeItem(UPDATED_AT_KEY);
+  clearWorkoutLocalState();
 }
 
 async function loadRemoteProfile(deviceId: string) {
@@ -102,13 +98,40 @@ export function useWorkoutStorage() {
   const [completions, setCompletions] = useState<CompletionState>({});
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('loading');
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
-  const [deviceId, setDeviceIdState] = useState(getDeviceId);
+  const [deviceId, setDeviceIdState] = useState<string | null>(null);
+  const [sharedMode, setSharedMode] = useState(false);
   const readyRef = useRef(false);
   const forceRemoteRef = useRef(false);
+  const sharedModeRef = useRef(false);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Load from server (or local fallback) on mount / sync-id change
+  // Resolve device ID (shared profile on server, or per-browser locally)
   useEffect(() => {
+    let cancelled = false;
+
+    async function boot() {
+      const resolved = await resolveDeviceId();
+      if (cancelled) return;
+
+      sharedModeRef.current = resolved.shared;
+      setSharedMode(resolved.shared);
+      if (resolved.shared) {
+        forceRemoteRef.current = true;
+      }
+      setDeviceIdState(resolved.deviceId);
+    }
+
+    boot();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Load from server (or local fallback) once device ID is known
+  useEffect(() => {
+    if (!deviceId) return;
+
+    const id = deviceId;
     let cancelled = false;
 
     async function init() {
@@ -117,7 +140,7 @@ export function useWorkoutStorage() {
 
       if (forceRemote) {
         try {
-          const profile = await loadRemoteProfile(deviceId);
+          const profile = await loadRemoteProfile(id);
           if (cancelled) return;
 
           setLogs(profile.logs);
@@ -139,11 +162,18 @@ export function useWorkoutStorage() {
       const local = loadLocalState();
 
       try {
-        const remote = await fetchRemoteState(deviceId);
+        const remote = await fetchRemoteState(id);
 
         if (cancelled) return;
 
-        if (remote?.updatedAt) {
+        if (sharedModeRef.current && remote?.updatedAt) {
+          setLogs(remote.logs);
+          setSettings({ ...defaultSettings, ...remote.settings });
+          setWeightLog(remote.weightLog);
+          setCompletions(remote.completions);
+          saveLocalState({ ...remote, updatedAt: remote.updatedAt });
+          setLastSyncedAt(remote.updatedAt);
+        } else if (remote?.updatedAt) {
           const localTime = local.updatedAt ? Date.parse(local.updatedAt) : 0;
           const remoteTime = Date.parse(remote.updatedAt);
 
@@ -159,18 +189,23 @@ export function useWorkoutStorage() {
             setSettings(local.settings);
             setWeightLog(local.weightLog);
             setCompletions(local.completions);
-            const updatedAt = await saveRemoteState(deviceId, local);
+            const updatedAt = await saveRemoteState(id, local);
             saveLocalState({ ...local, updatedAt });
             setLastSyncedAt(updatedAt);
           }
-        } else if (hasAnyData(local)) {
+        } else if (!sharedModeRef.current && hasAnyData(local)) {
           setLogs(local.logs);
           setSettings(local.settings);
           setWeightLog(local.weightLog);
           setCompletions(local.completions);
-          const updatedAt = await saveRemoteState(deviceId, local);
+          const updatedAt = await saveRemoteState(id, local);
           saveLocalState({ ...local, updatedAt });
           setLastSyncedAt(updatedAt);
+        } else if (sharedModeRef.current) {
+          setLogs({});
+          setSettings({ ...defaultSettings });
+          setWeightLog([]);
+          setCompletions({});
         } else {
           setLogs(local.logs);
           setSettings(local.settings);
@@ -181,10 +216,12 @@ export function useWorkoutStorage() {
         if (!cancelled) setSyncStatus('synced');
       } catch {
         if (cancelled) return;
-        setLogs(local.logs);
-        setSettings(local.settings);
-        setWeightLog(local.weightLog);
-        setCompletions(local.completions);
+        if (!sharedModeRef.current) {
+          setLogs(local.logs);
+          setSettings(local.settings);
+          setWeightLog(local.weightLog);
+          setCompletions(local.completions);
+        }
         setSyncStatus('offline');
       }
 
@@ -200,7 +237,7 @@ export function useWorkoutStorage() {
 
   // Persist locally + debounced remote save
   useEffect(() => {
-    if (!readyRef.current) return;
+    if (!deviceId || !readyRef.current) return;
 
     const state = { logs, settings, weightLog, completions };
     const updatedAt = new Date().toISOString();
@@ -299,6 +336,7 @@ export function useWorkoutStorage() {
     lastSyncedAt,
     deviceId,
     setSyncId,
+    sharedMode,
     updateSettings,
     getExerciseLog,
     updateSetLog,

@@ -36,7 +36,7 @@ function App() {
     setView('workout');
   };
 
-  if (storage.syncStatus === 'loading') {
+  if (storage.syncStatus === 'loading' || !storage.deviceId) {
     return (
       <div className="app-loading">
         <p>Loading your progress…</p>
@@ -55,7 +55,7 @@ function App() {
       lastSyncedAt={storage.lastSyncedAt}
       onPhaseChange={(id) => storage.updateSettings({ currentPhaseId: id })}
       onViewChange={setView}
-      onSyncClick={() => setSyncOpen(true)}
+      onSyncClick={storage.sharedMode ? undefined : () => setSyncOpen(true)}
     >
       <div key={view} className="page-enter">
         {view === 'workout' && (

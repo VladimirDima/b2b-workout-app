@@ -42,12 +42,24 @@ Without this, your logs reset on every redeploy.
 3. In **Variables**, add:
    - `DB_PATH` = `/data/workout.db`
 
-### 4. Generate a public URL
+### 4. Enable one shared profile (recommended)
+
+So every device sees the same data automatically — no Sync ID needed.
+
+In **Variables**, add:
+
+- `SHARED_DEVICE_ID` = `62ded9ca-3c68-424f-85fe-1467a93523e2` (or any UUID you prefer)
+
+The app always loads and saves this profile from the database. Phone, laptop, and tablet stay in sync.
+
+### 5. Generate a public URL
 
 1. Open **Settings** → **Networking** → **Generate Domain**
 2. You get something like `b2b-workout-app-production.up.railway.app`
 
-Open that URL on your phone. Tap **Sync** and paste:
+Open that URL on your phone. If you set `SHARED_DEVICE_ID`, your data loads automatically.
+
+If you did **not** set `SHARED_DEVICE_ID`, tap **Sync** and paste:
 
 ```
 62ded9ca-3c68-424f-85fe-1467a93523e2

@@ -4,11 +4,12 @@ import { isValidDeviceId } from '../utils/deviceId';
 
 interface SyncSettingsModalProps {
   deviceId: string;
+  sharedMode?: boolean;
   onApply: (syncId: string) => void;
   onClose: () => void;
 }
 
-export function SyncSettingsModal({ deviceId, onApply, onClose }: SyncSettingsModalProps) {
+export function SyncSettingsModal({ deviceId, sharedMode = false, onApply, onClose }: SyncSettingsModalProps) {
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
@@ -42,8 +43,12 @@ export function SyncSettingsModal({ deviceId, onApply, onClose }: SyncSettingsMo
         <div className="modal-content sync-settings-modal" onClick={(e) => e.stopPropagation()}>
           <div className="modal-header">
             <div>
-              <h3>Sync ID</h3>
-              <p className="modal-subtitle">Link progress across phone, Mac, and tunnel URLs</p>
+              <h3>{sharedMode ? 'Cloud save' : 'Sync ID'}</h3>
+              <p className="modal-subtitle">
+                {sharedMode
+                  ? 'Your progress is stored on the server — the same on every device'
+                  : 'Link progress across phone, Mac, and tunnel URLs'}
+              </p>
             </div>
             <button type="button" className="icon-btn" onClick={onClose} aria-label="Close">
               <span aria-hidden="true">✕</span>
@@ -63,6 +68,7 @@ export function SyncSettingsModal({ deviceId, onApply, onClose }: SyncSettingsMo
             </p>
           </div>
 
+          {!sharedMode && (
           <div className="sync-settings-section">
             <label className="sync-settings-label" htmlFor="sync-id-input">
               Use Sync ID from another device
@@ -87,11 +93,12 @@ export function SyncSettingsModal({ deviceId, onApply, onClose }: SyncSettingsMo
               Load this profile
             </button>
           </div>
+          )}
 
           <p className="sync-settings-footnote">
-            Loading a Sync ID always pulls from the server and replaces data on this device.
-            Make sure the server is running (<code>npm run share</code>) and shows Synced before
-            you log workouts.
+            {sharedMode
+              ? 'Every device using this app loads and saves the same profile from the database.'
+              : 'Loading a Sync ID always pulls from the server and replaces data on this device. Make sure the server is running and shows Synced before you log workouts.'}
           </p>
         </div>
       </div>

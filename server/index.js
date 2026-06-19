@@ -13,8 +13,17 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '2mb' }));
 
+const SHARED_DEVICE_ID = process.env.SHARED_DEVICE_ID?.trim() || null;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+app.get('/api/config', (_req, res) => {
+  const sharedDeviceId =
+    SHARED_DEVICE_ID && UUID_RE.test(SHARED_DEVICE_ID) ? SHARED_DEVICE_ID : null;
+  res.json({ sharedDeviceId });
+});
+
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, db: dbPath });
+  res.json({ ok: true, db: dbPath, sharedProfile: Boolean(SHARED_DEVICE_ID) });
 });
 
 app.get('/api/data/:deviceId', (req, res) => {

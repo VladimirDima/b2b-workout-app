@@ -6,7 +6,18 @@ export function getYouTubeId(url: string | null | undefined): string | null {
   return match ? match[1] : null;
 }
 
-export function getEmbedUrl(url: string | null | undefined): string | null {
+export function getEmbedUrl(
+  url: string | null | undefined,
+  options?: { autoplay?: boolean; mute?: boolean }
+): string | null {
   const id = getYouTubeId(url);
-  return id ? `https://www.youtube.com/embed/${id}` : null;
+  if (!id) return null;
+
+  const params = new URLSearchParams();
+  if (options?.autoplay) params.set('autoplay', '1');
+  if (options?.mute) params.set('mute', '1');
+  if (options?.autoplay) params.set('playsinline', '1');
+
+  const query = params.toString();
+  return `https://www.youtube.com/embed/${id}${query ? `?${query}` : ''}`;
 }

@@ -8,7 +8,7 @@ interface VideoModalProps {
 }
 
 export function VideoModal({ title, videoUrl, onClose }: VideoModalProps) {
-  const embedUrl = getEmbedUrl(videoUrl);
+  const embedUrl = getEmbedUrl(videoUrl, { autoplay: true, mute: true });
 
   return (
     <ModalPortal>

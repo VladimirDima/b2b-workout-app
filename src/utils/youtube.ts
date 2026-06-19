@@ -16,7 +16,13 @@ export function getEmbedUrl(
   const params = new URLSearchParams();
   if (options?.autoplay) params.set('autoplay', '1');
   if (options?.mute) params.set('mute', '1');
-  if (options?.autoplay) params.set('playsinline', '1');
+  if (options?.autoplay) {
+    params.set('playsinline', '1');
+    params.set('enablejsapi', '1');
+    if (typeof window !== 'undefined') {
+      params.set('origin', window.location.origin);
+    }
+  }
 
   const query = params.toString();
   return `https://www.youtube.com/embed/${id}${query ? `?${query}` : ''}`;

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { flushSync } from 'react-dom';
 import type { Exercise, ProgressionWeek, SetLog } from '../types';
 import { MuscleMapButton } from './MuscleMapButton';
 import { VideoModal } from './VideoModal';
@@ -43,7 +44,7 @@ export function ExerciseCard({ exercise, weekData, setLogs, exerciseDone, onSetC
             <button
               type="button"
               className="video-btn"
-              onClick={() => setShowVideo(true)}
+              onClick={() => flushSync(() => setShowVideo(true))}
               title="Watch tutorial"
             >
               Watch

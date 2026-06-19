@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { flushSync } from 'react-dom';
 import type { Program } from '../types';
 import { MuscleMapButton } from './MuscleMapButton';
 import { VideoModal } from './VideoModal';
@@ -105,7 +106,9 @@ export function ExerciseLibrary({ program }: ExerciseLibraryProps) {
                 <button
                   type="button"
                   className="video-btn small"
-                  onClick={() => setActiveVideo({ title: ex.name, url: ex.videoUrl! })}
+                  onClick={() =>
+                    flushSync(() => setActiveVideo({ title: ex.name, url: ex.videoUrl! }))
+                  }
                 >
                   ▶ Video
                 </button>

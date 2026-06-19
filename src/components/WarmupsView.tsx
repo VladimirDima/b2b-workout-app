@@ -1,8 +1,7 @@
-import { useState } from 'react';
-import { flushSync } from 'react-dom';
 import type { WarmupSection } from '../types';
 import { MuscleMapButton } from './MuscleMapButton';
 import { VideoModal } from './VideoModal';
+import { useState } from 'react';
 
 interface WarmupsViewProps {
   warmups: WarmupSection[];
@@ -30,11 +29,7 @@ export function WarmupsView({ warmups }: WarmupsViewProps) {
                     <button
                       type="button"
                       className="video-btn small"
-                      onClick={() =>
-                        flushSync(() =>
-                          setActiveVideo({ title: ex.name, url: ex.videoUrl! })
-                        )
-                      }
+                      onClick={() => setActiveVideo({ title: ex.name, url: ex.videoUrl! })}
                     >
                       ▶
                     </button>

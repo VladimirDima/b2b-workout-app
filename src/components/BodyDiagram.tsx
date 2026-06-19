@@ -1,4 +1,4 @@
-import { anteriorData, posteriorData } from '../data/bodyDiagramPaths';
+import { anteriorData, posteriorData, type BodyMusclePolygonGroup } from '../data/bodyDiagramPaths';
 import { getActiveMuscles, getHighlightedRbhMuscles, type RbhMuscle } from '../utils/muscleMap';
 
 type DiagramTone = 'light' | 'dark';
@@ -47,7 +47,7 @@ function MusclePolygons({
   palette,
   transform,
 }: {
-  data: typeof anteriorData;
+  data: BodyMusclePolygonGroup[];
   highlighted: Set<RbhMuscle>;
   palette: DiagramPalette;
   transform?: string;

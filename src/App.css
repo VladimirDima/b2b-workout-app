@@ -1010,6 +1010,10 @@
   color: var(--text-muted);
 }
 
+.workout-view .page-header {
+  margin-bottom: 1.25rem;
+}
+
 .workout-view .page-header h2 {
   font-size: 2rem;
   font-weight: 800;
@@ -1021,14 +1025,23 @@
   color: var(--text-muted);
 }
 
+.workout-block {
+  margin-top: 1.5rem;
+}
+
+.workout-block + .workout-block {
+  margin-top: 2rem;
+  padding-top: 0.25rem;
+}
+
 .block-title {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--text-muted);
   font-weight: 700;
-  margin-bottom: 1rem;
-  padding-bottom: 0;
+  margin: 0 0 0.75rem;
+  padding: 0;
   border-bottom: none;
 }
 
@@ -1105,6 +1118,25 @@
   accent-color: var(--accent);
   justify-self: center;
   cursor: pointer;
+}
+
+.set-done-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  justify-self: center;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.set-done-indicator.is-done {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: 50%;
+  font-size: 0.85rem;
 }
 
 .muscle-groups {

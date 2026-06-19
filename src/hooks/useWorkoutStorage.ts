@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { AppSettings, CompletionRecord, CompletionState, SetLog, WeightEntry, WorkoutLogs } from '../types';
+import { applySetPatch, createDefaultSetLog, normalizeSetLog } from '../utils/setLog';
 import { fetchRemoteState, saveRemoteState, type SyncStatus } from '../api/storageApi';
 import { setDeviceId, isValidDeviceId, clearWorkoutLocalState, resolveDeviceId } from '../utils/deviceId';
 
@@ -266,10 +267,10 @@ export function useWorkoutStorage() {
   }, []);
 
   const getExerciseLog = useCallback(
-    (key: string, setCount: number): SetLog[] => {
+    (key: string, setCount: number) => {
       const existing = logs[key]?.sets ?? [];
       return Array.from({ length: setCount }, (_, i) =>
-        existing[i] ?? { weight: '', reps: '', completed: false }
+        existing[i] ? normalizeSetLog(existing[i]) : createDefaultSetLog()
       );
     },
     [logs]
@@ -279,10 +280,7 @@ export function useWorkoutStorage() {
     (key: string, setIndex: number, patch: Partial<SetLog>, setCount: number) => {
       setLogs((prev) => {
         const current = prev[key]?.sets ?? [];
-        const sets = Array.from({ length: setCount }, (_, i) =>
-          current[i] ?? { weight: '', reps: '', completed: false }
-        );
-        sets[setIndex] = { ...sets[setIndex], ...patch };
+        const sets = applySetPatch(current, setIndex, patch, setCount);
         return { ...prev, [key]: { sets } };
       });
     },

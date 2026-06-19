@@ -15,6 +15,19 @@ export function ExerciseCard({ exercise, weekData, setLogs, exerciseDone, onSetC
   const [showVideo, setShowVideo] = useState(false);
   const setCount = Number(weekData?.sets) || setLogs.length || 3;
 
+  const handleFieldFocus = (
+    e: React.FocusEvent<HTMLInputElement>,
+    setIndex: number,
+    field: 'weight' | 'reps',
+    currentValue: string
+  ) => {
+    const input = e.currentTarget;
+    if (currentValue.trim() === '') {
+      onSetChange(setIndex, { [field]: '0' });
+    }
+    requestAnimationFrame(() => input.select());
+  };
+
   return (
     <article className={`exercise-card ${exerciseDone ? 'exercise-done' : ''}`}>
       <div className="exercise-header">
@@ -74,23 +87,28 @@ export function ExerciseCard({ exercise, weekData, setLogs, exerciseDone, onSetC
               <input
                 type="text"
                 inputMode="decimal"
-                placeholder="lbs/kg"
+                placeholder="0"
                 value={log.weight}
+                onFocus={(e) => handleFieldFocus(e, i, 'weight', log.weight)}
                 onChange={(e) => onSetChange(i, { weight: e.target.value })}
+                onBlur={(e) => {
+                  if (e.target.value.trim() === '') onSetChange(i, { weight: '0' });
+                }}
               />
               <input
                 type="text"
                 inputMode="numeric"
-                placeholder="reps"
+                placeholder="0"
                 value={log.reps}
+                onFocus={(e) => handleFieldFocus(e, i, 'reps', log.reps)}
                 onChange={(e) => onSetChange(i, { reps: e.target.value })}
+                onBlur={(e) => {
+                  if (e.target.value.trim() === '') onSetChange(i, { reps: '0' });
+                }}
               />
-              <input
-                type="checkbox"
-                checked={log.completed}
-                onChange={(e) => onSetChange(i, { completed: e.target.checked })}
-                aria-label={`Mark set ${i + 1} complete`}
-              />
+              <span className={`set-done-indicator ${log.completed ? 'is-done' : ''}`} aria-hidden="true">
+                {log.completed ? '✓' : ''}
+              </span>
             </div>
           );
         })}

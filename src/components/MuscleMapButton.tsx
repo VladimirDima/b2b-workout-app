@@ -6,9 +6,10 @@ interface MuscleMapButtonProps {
   exerciseName: string;
   muscleGroups: string[];
   compact?: boolean;
+  inline?: boolean;
 }
 
-export function MuscleMapButton({ exerciseName, muscleGroups, compact = false }: MuscleMapButtonProps) {
+export function MuscleMapButton({ exerciseName, muscleGroups, compact = false, inline = false }: MuscleMapButtonProps) {
   const [open, setOpen] = useState(false);
 
   if (muscleGroups.length === 0) return null;
@@ -17,15 +18,21 @@ export function MuscleMapButton({ exerciseName, muscleGroups, compact = false }:
     <>
       <button
         type="button"
-        className={`muscle-map-btn ${compact ? 'compact' : ''}`}
+        className={inline ? 'exercise-btn-group-item' : `muscle-map-btn ${compact ? 'compact' : ''}`}
         onClick={() => setOpen(true)}
         title="View muscles worked"
         aria-label={`View muscle map for ${exerciseName}`}
       >
-        <span className="muscle-map-btn-preview" aria-hidden="true">
-          <BodyDiagram muscleGroups={muscleGroups} compact tone="light" />
-        </span>
-        {!compact && <span className="muscle-map-btn-label">Muscles</span>}
+        {inline ? (
+          <>💪 Muscles</>
+        ) : (
+          <>
+            <span className="muscle-map-btn-preview" aria-hidden="true">
+              <BodyDiagram muscleGroups={muscleGroups} compact tone="light" />
+            </span>
+            {!compact && <span className="muscle-map-btn-label">Muscles</span>}
+          </>
+        )}
       </button>
 
       {open && (

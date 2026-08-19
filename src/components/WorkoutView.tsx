@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { Phase } from '../types';
 import type { PhaseProgress } from '../utils/progress';
 import { makeLogKey } from '../hooks/useWorkoutStorage';
 import type { useWorkoutStorage } from '../hooks/useWorkoutStorage';
+import { useWorkoutTimer } from '../hooks/useWorkoutTimer';
 import { ExerciseCard } from './ExerciseCard';
 import {
   getSessionSetProgress,
@@ -41,6 +42,12 @@ export function WorkoutView({
   const sessionKey = makeSessionKey(phase.id, day.id, week);
   const sessionComplete = isSessionComplete(sessionKey, storage.completions);
   const progressMap = Object.fromEntries(phaseProgress.map((p) => [p.phaseId, p]));
+  const initialMs = storage.getTimer(sessionKey);
+  const handleTimerPersist = useCallback(
+    (ms: number) => storage.updateTimer(sessionKey, ms),
+    [storage, sessionKey]
+  );
+  const timer = useWorkoutTimer(sessionKey, initialMs, handleTimerPersist);
 
   const setProgress = useMemo(
     () => getSessionSetProgress(phase, day.id, week, storage.logs, makeLogKey),
@@ -99,6 +106,30 @@ export function WorkoutView({
             />
           </div>
         </div>
+        <div className="workout-timer-row">
+          <button
+            type="button"
+            className={`workout-timer-toggle ${timer.running ? 'running' : ''}`}
+            onClick={timer.toggle}
+            aria-label={timer.running ? 'Pause timer' : 'Start timer'}
+          >
+            <span className="workout-timer-icon" aria-hidden="true">
+              {timer.running ? '❚❚' : '▶'}
+            </span>
+            <span className="workout-timer-display">{timer.formattedTime}</span>
+          </button>
+          {timer.elapsed > 0 && (
+            <button
+              type="button"
+              className="workout-timer-reset"
+              onClick={timer.reset}
+              aria-label="Reset timer"
+            >
+              Reset
+            </button>
+          )}
+        </div>
+
         <button
           type="button"
           className={`complete-workout-btn ${sessionComplete ? 'done' : ''}`}
@@ -164,12 +195,22 @@ export function WorkoutView({
               const setLogs = storage.getExerciseLog(logKey, setCount);
               const exerciseDone = setLogs.length > 0 && setLogs.every((s) => s.completed);
 
+              const prevWeek = week - 1;
+              const prevSetLogs = prevWeek >= 1
+                ? storage.getExerciseLog(
+                    makeLogKey(phase.id, day.id, prevWeek, exercise.name),
+                    setCount
+                  )
+                : undefined;
+              const hasPrevData = prevSetLogs?.some((s) => s.weight || s.reps);
+
               return (
                 <ExerciseCard
                   key={exercise.name}
                   exercise={exercise}
                   weekData={weekData}
                   setLogs={setLogs}
+                  prevSetLogs={hasPrevData ? prevSetLogs : undefined}
                   exerciseDone={exerciseDone}
                   onSetChange={(setIndex, patch) =>
                     storage.updateSetLog(logKey, setIndex, patch, setCount)

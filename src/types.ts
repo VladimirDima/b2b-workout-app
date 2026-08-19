@@ -76,6 +76,9 @@ export interface CompletionRecord {
   completedAt: string;
 }
 
+/** Elapsed workout time in milliseconds, keyed by session key (phase::day::week). */
+export type SessionTimers = Record<string, number>;
+
 export type CompletionState = Record<string, CompletionRecord>;
 
 export interface AppSettings {

@@ -20,14 +20,26 @@ db.exec(`
     settings TEXT NOT NULL DEFAULT '{}',
     weight_log TEXT NOT NULL DEFAULT '[]',
     completions TEXT NOT NULL DEFAULT '{}',
+    exercise_notes TEXT NOT NULL DEFAULT '{}',
     updated_at TEXT NOT NULL
   )
 `);
 
+const userDataColumns = db
+  .prepare(`PRAGMA table_info(user_data)`)
+  .all()
+  .map((col) => col.name);
+
+if (!userDataColumns.includes('exercise_notes')) {
+  db.exec(
+    `ALTER TABLE user_data ADD COLUMN exercise_notes TEXT NOT NULL DEFAULT '{}'`
+  );
+}
+
 export function getUserData(deviceId) {
   const row = db
     .prepare(
-      `SELECT device_id, logs, settings, weight_log, completions, updated_at
+      `SELECT device_id, logs, settings, weight_log, completions, exercise_notes, updated_at
        FROM user_data WHERE device_id = ?`
     )
     .get(deviceId);
@@ -40,6 +52,7 @@ export function getUserData(deviceId) {
     settings: JSON.parse(row.settings),
     weightLog: JSON.parse(row.weight_log),
     completions: JSON.parse(row.completions),
+    exerciseNotes: JSON.parse(row.exercise_notes || '{}'),
     updatedAt: row.updated_at,
   };
 }
@@ -47,13 +60,14 @@ export function getUserData(deviceId) {
 export function saveUserData(deviceId, data) {
   const updatedAt = new Date().toISOString();
   db.prepare(
-    `INSERT INTO user_data (device_id, logs, settings, weight_log, completions, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?)
+    `INSERT INTO user_data (device_id, logs, settings, weight_log, completions, exercise_notes, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(device_id) DO UPDATE SET
        logs = excluded.logs,
        settings = excluded.settings,
        weight_log = excluded.weight_log,
        completions = excluded.completions,
+       exercise_notes = excluded.exercise_notes,
        updated_at = excluded.updated_at`
   ).run(
     deviceId,
@@ -61,6 +75,7 @@ export function saveUserData(deviceId, data) {
     JSON.stringify(data.settings ?? {}),
     JSON.stringify(data.weightLog ?? []),
     JSON.stringify(data.completions ?? {}),
+    JSON.stringify(data.exerciseNotes ?? {}),
     updatedAt
   );
   return updatedAt;

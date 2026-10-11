@@ -35,7 +35,7 @@ app.get('/api/data/:deviceId', (req, res) => {
 });
 
 app.put('/api/data/:deviceId', (req, res) => {
-  const { logs, settings, weightLog, completions } = req.body ?? {};
+  const { logs, settings, weightLog, completions, exerciseNotes } = req.body ?? {};
   if (
     typeof logs !== 'object' ||
     typeof settings !== 'object' ||
@@ -45,11 +45,18 @@ app.put('/api/data/:deviceId', (req, res) => {
     return res.status(400).json({ error: 'Invalid payload' });
   }
 
+  const existing = getUserData(req.params.deviceId);
+  const nextExerciseNotes =
+    typeof exerciseNotes === 'object' && exerciseNotes !== null && !Array.isArray(exerciseNotes)
+      ? exerciseNotes
+      : (existing?.exerciseNotes ?? {});
+
   const updatedAt = saveUserData(req.params.deviceId, {
     logs,
     settings,
     weightLog,
     completions,
+    exerciseNotes: nextExerciseNotes,
   });
 
   res.json({ ok: true, updatedAt });

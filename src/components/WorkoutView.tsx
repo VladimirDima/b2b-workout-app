@@ -171,9 +171,11 @@ export function WorkoutView({
                   weekData={weekData}
                   setLogs={setLogs}
                   exerciseDone={exerciseDone}
+                  note={storage.getExerciseNote(exercise.name)}
                   onSetChange={(setIndex, patch) =>
                     storage.updateSetLog(logKey, setIndex, patch, setCount)
                   }
+                  onNoteChange={(value) => storage.updateExerciseNote(exercise.name, value)}
                 />
               );
             })}

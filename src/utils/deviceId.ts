@@ -6,6 +6,7 @@ const LOCAL_DATA_KEYS = [
   'b2b-workout-settings',
   'b2b-weight-log',
   'b2b-completions',
+  'b2b-exercise-notes',
   'b2b-updated-at',
 ] as const;
 

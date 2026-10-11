@@ -20,6 +20,7 @@ export function applySeedIfNeeded() {
     settings: seed.settings ?? {},
     weightLog: seed.weightLog ?? [],
     completions: seed.completions ?? {},
+    exerciseNotes: seed.exerciseNotes ?? {},
   });
 
   console.log(`Seeded workout profile: ${seed.deviceId}`);

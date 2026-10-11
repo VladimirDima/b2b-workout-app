@@ -1,10 +1,11 @@
-import type { AppSettings, CompletionState, WorkoutLogs, WeightEntry } from '../types';
+import type { AppSettings, CompletionState, ExerciseNotes, WorkoutLogs, WeightEntry } from '../types';
 
 export interface PersistedState {
   logs: WorkoutLogs;
   settings: AppSettings;
   weightLog: WeightEntry[];
   completions: CompletionState;
+  exerciseNotes: ExerciseNotes;
   updatedAt?: string;
 }
 
@@ -22,6 +23,7 @@ export async function fetchRemoteState(deviceId: string): Promise<PersistedState
     settings: data.settings,
     weightLog: data.weightLog,
     completions: data.completions,
+    exerciseNotes: data.exerciseNotes ?? {},
     updatedAt: data.updatedAt,
   };
 }
@@ -38,6 +40,7 @@ export async function saveRemoteState(
       settings: state.settings,
       weightLog: state.weightLog,
       completions: state.completions,
+      exerciseNotes: state.exerciseNotes,
     }),
   });
   if (!res.ok) throw new Error(`Save failed: ${res.status}`);

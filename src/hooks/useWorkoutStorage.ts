@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { AppSettings, CompletionRecord, CompletionState, SessionTimers, SetLog, WeightEntry, WorkoutLogs } from '../types';
+import type {
+  AppSettings,
+  CompletionRecord,
+  CompletionState,
+  ExerciseNotes,
+  SessionTimers,
+  SetLog,
+  WeightEntry,
+  WorkoutLogs,
+} from '../types';
 import { applySetPatch, createDefaultSetLog, normalizeSetLog } from '../utils/setLog';
 import { fetchRemoteState, saveRemoteState, type SyncStatus } from '../api/storageApi';
 import { setDeviceId, isValidDeviceId, clearWorkoutLocalState, resolveDeviceId } from '../utils/deviceId';
@@ -9,6 +18,7 @@ const SETTINGS_KEY = 'b2b-workout-settings';
 const WEIGHT_KEY = 'b2b-weight-log';
 const COMPLETIONS_KEY = 'b2b-completions';
 const TIMERS_KEY = 'b2b-timers';
+const EXERCISE_NOTES_KEY = 'b2b-exercise-notes';
 const UPDATED_AT_KEY = 'b2b-updated-at';
 
 const defaultSettings: AppSettings = {
@@ -35,6 +45,7 @@ function loadLocalState() {
     weightLog: loadJson<WeightEntry[]>(WEIGHT_KEY, []),
     completions: loadJson<CompletionState>(COMPLETIONS_KEY, {}),
     timers: loadJson<SessionTimers>(TIMERS_KEY, {}),
+    exerciseNotes: loadJson<ExerciseNotes>(EXERCISE_NOTES_KEY, {}),
     updatedAt: localStorage.getItem(UPDATED_AT_KEY) ?? undefined,
   };
 }
@@ -45,6 +56,7 @@ function saveLocalState(state: {
   weightLog: WeightEntry[];
   completions: CompletionState;
   timers?: SessionTimers;
+  exerciseNotes: ExerciseNotes;
   updatedAt?: string;
 }) {
   localStorage.setItem(LOGS_KEY, JSON.stringify(state.logs));
@@ -52,6 +64,7 @@ function saveLocalState(state: {
   localStorage.setItem(WEIGHT_KEY, JSON.stringify(state.weightLog));
   localStorage.setItem(COMPLETIONS_KEY, JSON.stringify(state.completions));
   if (state.timers) localStorage.setItem(TIMERS_KEY, JSON.stringify(state.timers));
+  localStorage.setItem(EXERCISE_NOTES_KEY, JSON.stringify(state.exerciseNotes));
   if (state.updatedAt) {
     localStorage.setItem(UPDATED_AT_KEY, state.updatedAt);
   }
@@ -70,6 +83,7 @@ async function loadRemoteProfile(deviceId: string) {
       weightLog: [] as WeightEntry[],
       completions: {} as CompletionState,
       timers: {} as SessionTimers,
+      exerciseNotes: {} as ExerciseNotes,
       updatedAt: undefined,
     };
   }
@@ -80,6 +94,7 @@ async function loadRemoteProfile(deviceId: string) {
     weightLog: remote.weightLog,
     completions: remote.completions,
     timers: remote.timers ?? ({} as SessionTimers),
+    exerciseNotes: remote.exerciseNotes ?? {},
     updatedAt: remote.updatedAt,
   };
 }
@@ -88,6 +103,7 @@ function hasAnyData(state: ReturnType<typeof loadLocalState>) {
   return (
     Object.keys(state.logs).length > 0 ||
     Object.keys(state.completions).length > 0 ||
+    Object.keys(state.exerciseNotes).length > 0 ||
     state.weightLog.length > 0 ||
     state.settings.bodyWeight !== '' ||
     state.settings.startDate !== defaultSettings.startDate
@@ -104,6 +120,7 @@ export function useWorkoutStorage() {
   const [weightLog, setWeightLog] = useState<WeightEntry[]>([]);
   const [completions, setCompletions] = useState<CompletionState>({});
   const [timers, setTimers] = useState<SessionTimers>({});
+  const [exerciseNotes, setExerciseNotes] = useState<ExerciseNotes>({});
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('loading');
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const [deviceId, setDeviceIdState] = useState<string | null>(null);
@@ -156,6 +173,7 @@ export function useWorkoutStorage() {
           setWeightLog(profile.weightLog);
           setCompletions(profile.completions);
           setTimers(profile.timers);
+          setExerciseNotes(profile.exerciseNotes);
           saveLocalState(profile);
           setLastSyncedAt(profile.updatedAt ?? null);
           setSyncStatus('synced');
@@ -181,7 +199,13 @@ export function useWorkoutStorage() {
           setWeightLog(remote.weightLog);
           setCompletions(remote.completions);
           setTimers(remote.timers ?? {});
-          saveLocalState({ ...remote, timers: remote.timers ?? {}, updatedAt: remote.updatedAt });
+          setExerciseNotes(remote.exerciseNotes ?? {});
+          saveLocalState({
+            ...remote,
+            timers: remote.timers ?? {},
+            exerciseNotes: remote.exerciseNotes ?? {},
+            updatedAt: remote.updatedAt,
+          });
           setLastSyncedAt(remote.updatedAt);
         } else if (remote?.updatedAt) {
           const localTime = local.updatedAt ? Date.parse(local.updatedAt) : 0;
@@ -193,7 +217,13 @@ export function useWorkoutStorage() {
             setWeightLog(remote.weightLog);
             setCompletions(remote.completions);
             setTimers(remote.timers ?? {});
-            saveLocalState({ ...remote, timers: remote.timers ?? {}, updatedAt: remote.updatedAt });
+            setExerciseNotes(remote.exerciseNotes ?? {});
+            saveLocalState({
+              ...remote,
+              timers: remote.timers ?? {},
+              exerciseNotes: remote.exerciseNotes ?? {},
+              updatedAt: remote.updatedAt,
+            });
             setLastSyncedAt(remote.updatedAt);
           } else {
             setLogs(local.logs);
@@ -201,6 +231,7 @@ export function useWorkoutStorage() {
             setWeightLog(local.weightLog);
             setCompletions(local.completions);
             setTimers(local.timers);
+            setExerciseNotes(local.exerciseNotes);
             const updatedAt = await saveRemoteState(id, local);
             saveLocalState({ ...local, updatedAt });
             setLastSyncedAt(updatedAt);
@@ -211,6 +242,7 @@ export function useWorkoutStorage() {
           setWeightLog(local.weightLog);
           setCompletions(local.completions);
           setTimers(local.timers);
+          setExerciseNotes(local.exerciseNotes);
           const updatedAt = await saveRemoteState(id, local);
           saveLocalState({ ...local, updatedAt });
           setLastSyncedAt(updatedAt);
@@ -220,12 +252,14 @@ export function useWorkoutStorage() {
           setWeightLog([]);
           setCompletions({});
           setTimers({});
+          setExerciseNotes({});
         } else {
           setLogs(local.logs);
           setSettings(local.settings);
           setWeightLog(local.weightLog);
           setCompletions(local.completions);
           setTimers(local.timers);
+          setExerciseNotes(local.exerciseNotes);
         }
 
         if (!cancelled) setSyncStatus('synced');
@@ -237,6 +271,7 @@ export function useWorkoutStorage() {
           setWeightLog(local.weightLog);
           setCompletions(local.completions);
           setTimers(local.timers);
+          setExerciseNotes(local.exerciseNotes);
         }
         setSyncStatus('offline');
       }
@@ -255,7 +290,7 @@ export function useWorkoutStorage() {
   useEffect(() => {
     if (!deviceId || !readyRef.current) return;
 
-    const state = { logs, settings, weightLog, completions, timers };
+    const state = { logs, settings, weightLog, completions, timers, exerciseNotes };
     const updatedAt = new Date().toISOString();
     saveLocalState({ ...state, updatedAt });
 
@@ -275,7 +310,7 @@ export function useWorkoutStorage() {
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
-  }, [logs, settings, weightLog, completions, timers, deviceId]);
+  }, [logs, settings, weightLog, completions, timers, exerciseNotes, deviceId]);
 
   const updateSettings = useCallback((patch: Partial<AppSettings>) => {
     setSettings((prev) => ({ ...prev, ...patch }));
@@ -301,6 +336,24 @@ export function useWorkoutStorage() {
     },
     []
   );
+
+  const getExerciseNote = useCallback(
+    (exerciseName: string) => exerciseNotes[exerciseName] ?? '',
+    [exerciseNotes]
+  );
+
+  const updateExerciseNote = useCallback((exerciseName: string, note: string) => {
+    setExerciseNotes((prev) => {
+      const trimmed = note;
+      if (!trimmed.trim()) {
+        if (!(exerciseName in prev)) return prev;
+        const next = { ...prev };
+        delete next[exerciseName];
+        return next;
+      }
+      return { ...prev, [exerciseName]: trimmed };
+    });
+  }, []);
 
   const addWeightEntry = useCallback((entry: WeightEntry) => {
     setWeightLog((prev) => [entry, ...prev.filter((e) => e.date !== entry.date)]);
@@ -356,6 +409,7 @@ export function useWorkoutStorage() {
     settings,
     weightLog,
     completions,
+    exerciseNotes,
     syncStatus,
     lastSyncedAt,
     deviceId,
@@ -364,6 +418,8 @@ export function useWorkoutStorage() {
     updateSettings,
     getExerciseLog,
     updateSetLog,
+    getExerciseNote,
+    updateExerciseNote,
     addWeightEntry,
     timers,
     getTimer,

@@ -21,20 +21,27 @@ db.exec(`
     weight_log TEXT NOT NULL DEFAULT '[]',
     completions TEXT NOT NULL DEFAULT '{}',
     timers TEXT NOT NULL DEFAULT '{}',
+    exercise_notes TEXT NOT NULL DEFAULT '{}',
     updated_at TEXT NOT NULL
   )
 `);
 
-// Migrate: add timers column if missing
+// Migrate: add columns if missing (existing Railway DBs)
 const cols = db.prepare(`PRAGMA table_info(user_data)`).all();
-if (!cols.some((c) => c.name === 'timers')) {
+const colNames = cols.map((c) => c.name);
+if (!colNames.includes('timers')) {
   db.exec(`ALTER TABLE user_data ADD COLUMN timers TEXT NOT NULL DEFAULT '{}'`);
+}
+if (!colNames.includes('exercise_notes')) {
+  db.exec(
+    `ALTER TABLE user_data ADD COLUMN exercise_notes TEXT NOT NULL DEFAULT '{}'`
+  );
 }
 
 export function getUserData(deviceId) {
   const row = db
     .prepare(
-      `SELECT device_id, logs, settings, weight_log, completions, timers, updated_at
+      `SELECT device_id, logs, settings, weight_log, completions, timers, exercise_notes, updated_at
        FROM user_data WHERE device_id = ?`
     )
     .get(deviceId);
@@ -48,6 +55,7 @@ export function getUserData(deviceId) {
     weightLog: JSON.parse(row.weight_log),
     completions: JSON.parse(row.completions),
     timers: JSON.parse(row.timers || '{}'),
+    exerciseNotes: JSON.parse(row.exercise_notes || '{}'),
     updatedAt: row.updated_at,
   };
 }
@@ -55,14 +63,15 @@ export function getUserData(deviceId) {
 export function saveUserData(deviceId, data) {
   const updatedAt = new Date().toISOString();
   db.prepare(
-    `INSERT INTO user_data (device_id, logs, settings, weight_log, completions, timers, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)
+    `INSERT INTO user_data (device_id, logs, settings, weight_log, completions, timers, exercise_notes, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(device_id) DO UPDATE SET
        logs = excluded.logs,
        settings = excluded.settings,
        weight_log = excluded.weight_log,
        completions = excluded.completions,
        timers = excluded.timers,
+       exercise_notes = excluded.exercise_notes,
        updated_at = excluded.updated_at`
   ).run(
     deviceId,
@@ -71,6 +80,7 @@ export function saveUserData(deviceId, data) {
     JSON.stringify(data.weightLog ?? []),
     JSON.stringify(data.completions ?? {}),
     JSON.stringify(data.timers ?? {}),
+    JSON.stringify(data.exerciseNotes ?? {}),
     updatedAt
   );
   return updatedAt;

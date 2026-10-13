@@ -1298,6 +1298,33 @@
   font-style: italic;
 }
 
+.exercise-note {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.85rem;
+}
+
+.exercise-note-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.exercise-note-input {
+  width: 100%;
+  min-height: 44px;
+  background: var(--bg-muted);
+  border-color: transparent;
+}
+
+.exercise-note-input:focus {
+  border-color: var(--border-strong);
+  background: var(--bg-elevated);
+}
+
 .set-logging {
   margin-top: 0.5rem;
 }

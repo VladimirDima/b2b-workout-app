@@ -9,10 +9,21 @@ interface ExerciseCardProps {
   setLogs: SetLog[];
   prevSetLogs?: SetLog[];
   exerciseDone?: boolean;
+  note: string;
   onSetChange: (setIndex: number, patch: Partial<SetLog>) => void;
+  onNoteChange: (note: string) => void;
 }
 
-export function ExerciseCard({ exercise, weekData, setLogs, prevSetLogs, exerciseDone, onSetChange }: ExerciseCardProps) {
+export function ExerciseCard({
+  exercise,
+  weekData,
+  setLogs,
+  prevSetLogs,
+  exerciseDone,
+  note,
+  onSetChange,
+  onNoteChange,
+}: ExerciseCardProps) {
   const [showVideo, setShowVideo] = useState(false);
   const setCount = Number(weekData?.sets) || setLogs.length || 3;
 
@@ -122,6 +133,18 @@ export function ExerciseCard({ exercise, weekData, setLogs, prevSetLogs, exercis
           );
         })}
       </div>
+
+      <label className="exercise-note">
+        <span className="exercise-note-label">Note</span>
+        <input
+          type="text"
+          className="exercise-note-input"
+          placeholder="Cue, grip, form tip…"
+          value={note}
+          onChange={(e) => onNoteChange(e.target.value)}
+          aria-label={`Note for ${exercise.name}`}
+        />
+      </label>
 
       {showVideo && exercise.videoUrl && (
         <VideoModal

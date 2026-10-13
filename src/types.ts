@@ -67,6 +67,9 @@ export interface WorkoutLogs {
   [key: string]: ExerciseLog;
 }
 
+/** Personal notes keyed by exercise name — carry across trainings of the same type. */
+export type ExerciseNotes = Record<string, string>;
+
 export interface WeightEntry {
   date: string;
   weight: string;

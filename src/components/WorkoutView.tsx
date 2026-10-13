@@ -212,9 +212,11 @@ export function WorkoutView({
                   setLogs={setLogs}
                   prevSetLogs={hasPrevData ? prevSetLogs : undefined}
                   exerciseDone={exerciseDone}
+                  note={storage.getExerciseNote(exercise.name)}
                   onSetChange={(setIndex, patch) =>
                     storage.updateSetLog(logKey, setIndex, patch, setCount)
                   }
+                  onNoteChange={(value) => storage.updateExerciseNote(exercise.name, value)}
                 />
               );
             })}
